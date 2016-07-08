@@ -155,10 +155,10 @@ public class ServerControl {
             File file =new File(Environment.getExternalStorageDirectory(),requestURL.substring("/sdcard".length()));
             print.println("HTTP/1.1 200 OK");
             print.println("Date: Sat, 31 Dec 2005 23:59:59 GMT");
-            print.println("Content-Type: text/html;charset=utf-8");
-            print.print("\r\n");
 
             if(file.isDirectory()){//文件夹
+                print.println("Content-Type: text/html;charset=utf-8");
+                print.print("\r\n");
                 print.println("<html>");
                 print.println("<head>");
                 print.println("<title>TerminalSystem</title>");
@@ -172,7 +172,10 @@ public class ServerControl {
                 print.println("</body>");
                 print.println("</html>");
             }else{
-                print.println("<a href='/sdcard'>"+file.getName()+"</a>");
+                print.println("Content-Type: text/html;charset=utf-8");
+                print.print("Content-Length: "+file.length());
+                print.print("\r\n");
+                print.print(file.)
             }
 
         }
