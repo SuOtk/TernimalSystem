@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 
 import terminal.spectre.com.terminalsystem.bean.Request;
+import terminal.spectre.com.terminalsystem.http.HttpParser;
 
 /**
  * Created by Administrator on 2016/7/8.
@@ -104,12 +106,20 @@ public class ServerControl {
         public void run() {
             try {
                 InputStream inputStream = accept.getInputStream();
-                Request request = RequsetParser.parse(inputStream);
-                PrintWriter pw = new PrintWriter(accept.getOutputStream());
-                doGet(request,pw);
-                pw.flush();
-                pw.close();
-                inputStream.close();
+
+//                Request request = RequsetParser.parse(inputStream);
+//                String value = HttpParser.parseHttpRequest("GET /sdcard HTTP/1.1\r\nAccept-Language: zh-CN\r\n");
+                String inputString =null;
+                inputString = readInputStream(inputStream);
+                Log.i(TAG,"inputString:"+inputString);
+                String value = HttpParser.parseHttpRequest(inputString);
+                Log.i(TAG,"value:"+value);
+
+//                PrintWriter pw = new PrintWriter(accept.getOutputStream());
+//                doGet(request,pw);
+//                pw.flush();
+//                pw.close();
+//                inputStream.close();
                 accept.close();
             } catch (IOException e) {
                 Log.i(TAG,"error"+e.getMessage());
@@ -175,7 +185,7 @@ public class ServerControl {
                 print.println("Content-Type: text/html;charset=utf-8");
                 print.print("Content-Length: "+file.length());
                 print.print("\r\n");
-                print.print(file.)
+//                print.print(file.)
             }
 
         }
@@ -189,5 +199,52 @@ public class ServerControl {
 
     public void setStatusListener(ServerStatusListener listener){
         this.mListener = listener;
+    }
+
+    /**
+     * 从输入流获取数据
+     * @param inputStream
+     * @return
+     * @throws Exception
+     */
+    public  static String readInputStream(InputStream inputStream) {
+        Log.i(TAG,"inputStream:"+inputStream);
+        byte[] buffer = new byte[1024];
+        byte[] bytes = null;
+        int len = -1;
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+
+            while((len = inputStream.read(buffer)) != -1){
+                Log.i(TAG,"len:"+len);
+                outputStream.write(buffer, 0, len);
+                int ava = inputStream.available();
+                if(ava==0){
+                    Thread.sleep(100);
+                    ava = inputStream.available();
+                    if(ava==0){
+                        break;
+                    }
+                }
+                Log.i(TAG,"ava:"+ava);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            bytes = outputStream.toByteArray();
+        }
+        return new String(bytes);
     }
 }

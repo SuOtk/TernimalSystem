@@ -3,17 +3,23 @@ package terminal.spectre.com.terminalsystem.ui;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import terminal.spectre.com.terminalsystem.R;
 import terminal.spectre.com.terminalsystem.core.ServerControl;
+import terminal.spectre.com.terminalsystem.http.HttpParser;
 
 public class MainActivity extends AppCompatActivity implements ServerControl.ServerStatusListener {
-
+    private static final String TAG = "MainActivity";
     @BindView(R.id.status)
     ImageView mStatusView;
 
